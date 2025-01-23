@@ -11,14 +11,31 @@ void log_help(std::ostream& os){
 //temporary part, just to check the function works properly
 //the faulty logic will then be replaced
 int ulam_index(int x, int y, int s){
-  return x+y*s;
+  return x+y*s ;
 }
 
-int is_prime(int nr){
+sf::Color paint(int hand){
+  sf::Color brushes[] = {
+    sf::Color::Yellow, sf::Color::Magenta
+  };
+
+  if(hand >= 2)
+    return sf::Color::White;
+  else
+    return brushes[hand];//because factor count starts from 2
+}
+
+unsigned int factor_count(unsigned int nr){
+  if(1 == nr)
+    return -1;//give a large factor count because it is not a prime
+  int result=2;
   for(int i=2; i < nr/2; i++)
-    if(nr % i == 0)
-      return 0;
-  return 1;
+    if(nr % i == 0){
+      result++;
+      for(;nr%i==0;nr/=i); //extract all of the factors
+      i=2;
+    }
+  return result;
 }
 
 int main(int argc, char *argv[]){
@@ -42,8 +59,7 @@ int main(int argc, char *argv[]){
   img.create(sz, sz, sf::Color::White);
   for(int x=0; x < sz; x++)
     for(int y=0; y < sz; y++)
-      if(is_prime(ulam_index(x, y, sz)))
-        img.setPixel(x, y, sf::Color::Black);
+      img.setPixel(x, y, paint(factor_count(ulam_index(x, y, sz)) - 2));
   char file[311];
   sprintf(file, "data/%d.png", sz);
   img.saveToFile(file);
